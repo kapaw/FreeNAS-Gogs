@@ -17,12 +17,12 @@ else
     # 3) Enable SSH
     echo "Enabling SSH"
     /usr/bin/sed -i '.bak' 's/sshd_enable="NO"/sshd_enable="YES"/g' /etc/rc.conf
-    # Generate root keys &  Enable root login (with SSH keys). 
-    echo "Enabling root login without password"
-    echo "PermitRootLogin without-password" >> /etc/ssh/sshd_config
+    # Allow local port forwards only
+    echo "AllowTcpForwarding local" >> /etc/ssh/sshd_config
     # Start SSH
     echo "Starting SSH Service"
     /usr/sbin/service sshd start
+    /usr/sbin/service sshd restart
     # 4) Update packages and upgrade any.
     echo "Updating packages"
     /usr/sbin/pkg update -f
@@ -45,7 +45,7 @@ else
     endif
     pw add user -n git -u 913 -d $GITHOME -s /bin/tcsh -c "Gogs -  Go Git Service"
     chown -R git:git $GITHOME
-    su - git -c "/usr/bin/ssh-keygen -b 2048 -N '' -f ~/.ssh/id_rsa -t rsa -q &"
+    su - git -c "/usr/bin/ssh-keygen -t ed25519 -a 100 -N '' -f ~/.ssh/id_ed25519 -q &"
     # 6) Get & compile gogs
     ./gogs-compile.sh
     su - git -c "ln -s /usr/home/git/.ssh/ /usr/home/git/gogs/"
